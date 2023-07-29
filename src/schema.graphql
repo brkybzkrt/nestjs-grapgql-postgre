@@ -2,6 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Book {
+  id: String!
+  name: String!
+  price: Int!
+}
+
 type Query {
-  index: String!
+  books: [Book!]!
+  bookById(id: String!): Book!
+}
+
+type Mutation {
+  createBook(createBookInput: CreateBookInput!): String!
+  deleteBookById(id: String!): String!
+  updateBookById(id: String!, updateBookInput: UpdateBookInput!): String!
+}
+
+input CreateBookInput {
+  name: String!
+  price: Int!
+}
+
+input UpdateBookInput {
+  name: String!
+  price: Int!
 }
