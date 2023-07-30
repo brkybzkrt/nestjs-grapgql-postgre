@@ -7,7 +7,6 @@ import { AppService } from './app.service';
 import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppResolver } from './app.resolver';
 import { BookModule } from './book/book.module';
 
 @Module({
@@ -17,28 +16,28 @@ import { BookModule } from './book/book.module';
       driver: ApolloDriver,
       playground: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.graphql'),
-      definitions:{
-        path:join(process.cwd(), 'src/graphql.ts')
+      definitions: {
+        path: join(process.cwd(), 'src/graphql.ts')
       }
     }),
-    TypeOrmModule.forRoot({
- 
-       type:"postgres",
-       host: "localhost",
-       port: 5432,
-       username: "postgres",
-       password: "deneme123",
-       database: "deneme123",
-       synchronize: true,
-       entities:[__dirname+'/**/*.entity{.ts,.js}']
 
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: +configService.get<number>('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_NAME'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: configService.get('DB_SYNCHRONIZE'),
       }),
+      inject: [ConfigService],
+    }),
     BookModule,
-
-
-
   ],
   controllers: [AppController],
-  providers: [AppService, AppResolver],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
